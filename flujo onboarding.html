@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Infografía Flujo de Homologación de Proveedores</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+    /* Estilos personalizados para el flujo de trabajo */
+    :root {
+        --color-step: #3498db;
+        --color-action: #2ecc71;
+        --color-decision: #e67e22;
+        --color-end: #c0392b;
+        --color-background: #f4f7f9;
+        --color-text: #2c3e50;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: var(--color-background);
+        color: var(--color-text);
+        padding: 20px;
+    }
+    .flow-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .step-card {
+        width: 100%;
+        max-width: 400px;
+        padding: 20px;
+        margin-bottom: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .step-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+    }
+    .step-header {
+        font-size: 1.25rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+    .step-icon {
+        margin-right: 10px;
+        font-size: 1.5rem;
+    }
+
+    /* Conectores de flecha */
+    .connector {
+        position: relative;
+        height: 50px;
+        width: 2px;
+        background-color: var(--color-step);
+        margin: 0 auto;
+    }
+    .connector::after {
+        content: '▼';
+        position: absolute;
+        bottom: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+        color: var(--color-step);
+        font-size: 1.5rem;
+    }
+
+    /* Estilos específicos de etapa */
+    .stage-1 { background-color: #ecf0f1; border-left: 5px solid #3498db; }
+    .stage-2 { background-color: #e8f8f5; border-left: 5px solid #2ecc71; }
+    .stage-3 { background-color: #fef9e7; border-left: 5px solid #f39c12; }
+    .stage-4 { background-color: #fdebd0; border-left: 5px solid #e74c3c; }
+
+    /* Estilos para decisiones (Rompimiento del flujo) */
+    .decision-point {
+        width: 90%;
+        max-width: 350px;
+        padding: 10px;
+        background-color: #f7dc6f;
+        border-radius: 8px;
+        text-align: center;
+        font-weight: bold;
+        margin-top: 10px;
+        color: #b7950b;
+        border: 2px solid #f1c40f;
+    }
+
+    @media (min-width: 768px) {
+        .flow-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        .step-card {
+            max-width: 600px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<div class="flow-container">
+    <h1 class="text-3xl font-extrabold text-center mb-10 text-blue-700">
+        Flujo de Homologación de Proveedores (WFL)
+    </h1>
+
+    <!-- TÍTULO GLOBAL -->
+    <div class="step-card stage-1 text-center">
+        <div class="step-header justify-center text-blue-700">
+            <span class="step-icon">🏁</span> INICIO DEL PROCESO
+        </div>
+        <p class="text-sm text-gray-600">Creación de la ficha de proveedor y activación del proceso de homologación.</p>
+    </div>
+
+    <!-- 1. CREACIÓN DE FICHA -->
+    <div class="connector"></div>
+    <div class="step-card stage-1">
+        <div class="step-header text-blue-700">
+            <span class="step-icon">1</span> Creación de la Ficha
+        </div>
+        <p class="text-sm">El área de Compras o un Validador crea la ficha en el sistema (SmartSRM).</p>
+        <p class="mt-2 font-semibold">Validación inicial:</p>
+        <ul class="list-disc list-inside text-sm ml-4">
+            <li>¿Existe la categoría de compra? (Si no, se crea)</li>
+            <li>¿Está cargada la organización en el sistema?</li>
+        </ul>
+        <div class="decision-point">
+            Proveedor en estado: **Pendiente de Cuestionario**
+        </div>
+    </div>
+
+    <!-- 2. CUESTIONARIOS Y DATOS COFACE -->
+    <div class="connector"></div>
+    <div class="step-card stage-2">
+        <div class="step-header text-green-700">
+            <span class="step-icon">2</span> Evaluación y Scoring
+        </div>
+        <p class="text-sm font-semibold mb-2">Recolección de Datos por Verticals de Riesgo:</p>
+        <ul class="list-disc list-inside text-sm ml-4 space-y-1">
+            <li>**Datos Financieros (COFACE):** Se buscan datos externos.</li>
+            <li>**Riesgos (Ciber, Operacional, Reputacional):** El proveedor completa los cuestionarios.</li>
+            <li>**Riesgos ESG:** El proveedor completa los cuestionarios.</li>
+        </ul>
+        <div class="decision-point bg-green-100 text-green-700 border-green-400">
+            Sistema calcula **Score Global de Riesgo**
+        </div>
+    </div>
+
+    <!-- 3. VALIDACIÓN INTERNA Y COMPLIANCE -->
+    <div class="connector"></div>
+    <div class="step-card stage-3">
+        <div class="step-header text-yellow-700">
+            <span class="step-icon">3</span> Validación y Decisión
+        </div>
+        <p class="text-sm font-semibold mb-2">Revisión de Resultados por Rol:</p>
+        <div class="ml-4 space-y-2">
+            <p class="text-sm">**Validador:** Revisa que el Score Global esté por encima del umbral (ej. 60/100).</p>
+            <p class="text-sm">**Compliance:** Revisa las alertas en las Verticals críticas (Reputacional y ESG).</p>
+        </div>
+        
+        <div class="decision-point bg-red-100 text-red-700 border-red-400">
+            <p class="font-bold">CRITERIO DE RECHAZO AUTOMÁTICO:</p>
+            <p class="text-xs">Si el Score de alguna vertical crítica es **< 50**, se puede activar el rechazo directo.</p>
+        </div>
+    </div>
+
+    <!-- 4. FINALIZACIÓN Y REGISTRO -->
+    <div class="connector"></div>
+    <div class="step-card stage-4">
+        <div class="step-header text-red-700">
+            <span class="step-icon">4</span> Finalización
+        </div>
+        <p class="text-sm font-semibold mb-2">El Validador finaliza el flujo con uno de estos resultados:</p>
+        <div class="flex flex-col md:flex-row justify-around mt-4 space-y-3 md:space-y-0 md:space-x-3">
+            <div class="p-3 bg-red-500 text-white rounded-lg shadow-md flex-1 text-center font-bold">
+                RECHAZADO ❌
+            </div>
+            <div class="p-3 bg-blue-500 text-white rounded-lg shadow-md flex-1 text-center font-bold">
+                EN OBSERVACIÓN ⚠️
+            </div>
+            <div class="p-3 bg-green-500 text-white rounded-lg shadow-md flex-1 text-center font-bold">
+                APROBADO ✅
+            </div>
+        </div>
+        <p class="mt-4 text-xs text-center text-gray-500">
+            El estado de homologación se registra en SmartSRM.
+        </p>
+    </div>
+
+    <!-- FINAL DEL PROCESO -->
+    <div class="connector"></div>
+    <div class="step-card stage-4 text-center">
+        <div class="step-header justify-center text-red-700">
+            <span class="step-icon">🛑</span> FIN DEL FLUJO
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
