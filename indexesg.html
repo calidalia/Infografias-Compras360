@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Riesgos ESG en Proveedores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Neutros Calmantes (Fondo: bg-gray-50, Texto: text-gray-800, Acentos: verde-teal-600/700, con toques de rojo/ámbar/verde para el gráfico de riesgo) -->
+    <!-- Application Structure Plan: Se ha diseñado una SPA con navegación superior fija (Inicio, Pilares, Marco, Gobernanza) para un acceso rápido. La estructura fluye lógicamente desde el objetivo general, a la sección interactiva "Los 3 Pilares" (núcleo del informe, con pestañas JS para E, S, G), siguiendo al "Marco Operativo" (visualizando el scoring con Chart.js y el proceso de revisión con diagramas HTML/Tailwind), y concluyendo con la "Gobernanza" (estándares y roles). Esta arquitectura se eligió para transformar el documento técnico en una guía exploratoria, agrupando la información por función (Qué, Cómo, Quién) en lugar de una simple enumeración, facilitando la comprensión del modelo como un sistema interconectado. -->
+    <!-- Visualization & Content Choices: 1. Pilares (E,S,G): (Info: Definiciones y KRIs de E, S, G) -> (Goal: Organizar/Comparar) -> (Viz: Pestañas interactivas HTML/Tailwind + JS. Iconos Unicode 🌳👥🏛️) -> (Interaction: onClick cambia el contenido visible) -> (Justification: Evita el "muro de texto", fomenta la exploración y comparación directa). 2. Escala de Scoring: (Info: Rangos 0-3, 4-7, 8-10) -> (Goal: Informar/Visualizar) -> (Viz: Gráfico de Donut con Chart.js/Canvas. Datos [3, 4, 3] representan el "ancho" de cada rango. Colores intuitivos rojo/ámbar/verde) -> (Interaction: Tooltips al pasar el ratón) -> (Justification: Visualiza las "zonas" de riesgo de forma clara. Complementado con tabla HTML para detalles). 3. Frecuencia Revisión: (Info: Crítico/Anual, No Crítico/Bienal) -> (Goal: Organizar/Informar) -> (Viz: Diagrama de 2 tarjetas con HTML/Tailwind/Flexbox) -> (Interaction: Ninguna) -> (Justification: Representación visual simple para un proceso simple). 4. Gobernanza/Estándares: (Info: Listas de roles y estándares) -> (Goal: Informar) -> (Viz: Listas semánticas HTML `<ul>`) -> (Justification: Presentación más clara para contenido textual). -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors;
+        }
+        .nav-link-active {
+            @apply bg-teal-100 text-teal-700;
+        }
+        .pillar-button {
+            @apply w-full md:w-1/3 px-4 py-3 text-lg font-semibold rounded-lg shadow-sm focus:outline-none transition-all duration-300;
+        }
+        .pillar-button-active {
+            @apply bg-teal-600 text-white shadow-lg scale-105;
+        }
+        .pillar-button-inactive {
+            @apply bg-white text-gray-700 hover:bg-gray-100;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header / Navigation -->
+    <header class="sticky top-0 z-50 bg-white/95 shadow-sm backdrop-blur-sm">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-teal-700">ESG</span>
+                    <span class="text-xl font-medium text-gray-600 ml-2 hidden sm:block">Gestión de Proveedores</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="nav-link nav-link-active">Inicio</a>
+                        <a href="#pilares" class="nav-link">Los 3 Pilares</a>
+                        <a href="#marco" class="nav-link">Marco Operativo</a>
+                        <a href="#gobernanza" class="nav-link">Gobernanza</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <!-- Mobile menu button -->
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <!-- Mobile menu, show/hide based on menu state. -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="nav-link block nav-link-active">Inicio</a>
+                <a href="#pilares" class="nav-link block">Los 3 Pilares</a>
+                <a href="#marco" class="nav-link block">Marco Operativo</a>
+                <a href="#gobernanza" class="nav-link block">Gobernanza</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Section 1: Inicio (Home) -->
+        <section id="inicio" class="text-center pt-16 pb-20">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Modelo de Gestión de Riesgos ESG en Proveedores
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Una guía interactiva para entender cómo alineamos nuestra cadena de suministro con estándares de sostenibilidad, mitigando riesgos ambientales, sociales y de gobernanza que impactan nuestra reputación y operaciones.
+            </p>
+        </section>
+
+        <!-- Section 2: Los 3 Pilares (The 3 Pillars) -->
+        <section id="pilares" class="py-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Los 3 Pilares del Riesgo ESG</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                El modelo se fundamenta en tres áreas de análisis clave. Cada pilar evalúa un conjunto específico de riesgos en la cadena de suministro. Haga clic en cada pilar para explorar sus definiciones y áreas clave.
+            </p>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                <button id="btn-e" class="pillar-button pillar-button-active">
+                    <span class="text-2xl mr-2">🌳</span> Ambiental (E)
+                </button>
+                <button id="btn-s" class="pillar-button pillar-button-inactive">
+                    <span class="text-2xl mr-2">👥</span> Social (S)
+                </button>
+                <button id="btn-g" class="pillar-button pillar-button-inactive">
+                    <span class="text-2xl mr-2">🏛️</span> Gobernanza (G)
+                </button>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg transition-all duration-300 min-h-[300px]">
+                <!-- Contenido Pilar E -->
+                <div id="content-e">
+                    <h3 class="text-2xl font-bold text-green-700 mb-4">🌳 Pilar Ambiental (E)</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        <strong>Definición Operativa:</strong> Evaluación de la gestión e impacto del proveedor sobre los recursos naturales y el medio ambiente, incluyendo sus emisiones, gestión de residuos y uso de recursos como el agua.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Áreas Clave de Análisis:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Emisiones de GEI y uso de Energía (Protocolos GHG).</li>
+                        <li>Gestión de Residuos (Tasas de reciclaje, vertidos, economía circular).</li>
+                        <li>Uso y Gestión del Agua (Consumo, tratamiento de efluentes, estrés hídrico).</li>
+                        <li>Biodiversidad y uso del Suelo (Impacto en ecosistemas, deforestación).</li>
+                    </ul>
+                </div>
+                <!-- Contenido Pilar S -->
+                <div id="content-s" class="hidden">
+                    <h3 class="text-2xl font-bold text-blue-700 mb-4">👥 Pilar Social (S)</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        <strong>Definición Operativa:</strong> Evaluación de las políticas y prácticas del proveedor en relación con los derechos humanos, las condiciones laborales de sus empleados y su impacto en las comunidades locales.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Áreas Clave de Análisis:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Derechos Laborales y Sindicales (Libertad de asociación, negociación colectiva).</li>
+                        <li>Salud y Seguridad Ocupacional (Índices de accidentabilidad, programas preventivos).</li>
+                        <li>No Discriminación e Inclusión (Igualdad de oportunidades, brecha salarial).</li>
+                        <li>Relación con la Comunidad (Impacto local, consulta a pueblos indígenas).</li>
+                        <li>Trabajo forzoso y trabajo infantil.</li>
+                    </ul>
+                </div>
+                <!-- Contenido Pilar G -->
+                <div id="content-g" class="hidden">
+                    <h3 class="text-2xl font-bold text-indigo-700 mb-4">🏛️ Pilar de Gobernanza (G)</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        <strong>Definición Operativa:</strong> Evaluación de la estructura de liderazgo, los controles internos, la ética empresarial, la lucha contra la corrupción y el cumplimiento normativo general del proveedor.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Áreas Clave de Análisis:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Ética y Cumplimiento Normativo (Canales de denuncia, códigos de conducta).</li>
+                        <li>Lucha contra la Corrupción y Soborno (Políticas, formación).</li>
+                        <li>Transparencia Fiscal y Reporte (Publicación de información no financiera).</li>
+                        <li>Estructura del Órgano de Gobierno (Independencia, diversidad).</li>
+                        <li>Ciberseguridad y Protección de Datos.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Marco Operativo (Operational Framework) -->
+        <section id="marco" class="py-16 scroll-mt-16 bg-gray-100 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Marco Operativo del Modelo</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                El modelo no solo define los riesgos, sino que establece un sistema claro para evaluarlos y actuar. Esto incluye una escala de puntuación y una frecuencia de revisión adaptada.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Columna 1: Scoring -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">📏 Escala de Scoring (0-10)</h3>
+                    <p class="text-gray-600 mb-6 text-center">
+                        Una escala calibrada de 0 a 10 evalúa la madurez del proveedor. El gráfico muestra las "zonas" de riesgo según la puntuación obtenida.
+                    </p>
+                    <div class="chart-container mb-8">
+                        <canvas id="scoringChart"></canvas>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Rango</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Significado</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción Típica</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="bg-red-50">
+                                    <td class="px-4 py-3 font-medium text-red-800">0 - 3</td>
+                                    <td class="px-4 py-3 text-red-700">Riesgo Alto / Crítico</td>
+                                    <td class="px-4 py-3 text-gray-700">Exclusión, Plan Correctivo Urgente.</td>
+                                </tr>
+                                <tr class="bg-yellow-50">
+                                    <td class="px-4 py-3 font-medium text-yellow-800">4 - 7</td>
+                                    <td class="px-4 py-3 text-yellow-700">Riesgo Medio / Básico</td>
+                                    <td class="px-4 py-3 text-gray-700">Monitoreo intensivo, Plan de Mejora.</td>
+                                </tr>
+                                <tr class="bg-green-50">
+                                    <td class="px-4 py-3 font-medium text-green-800">8 - 10</td>
+                                    <td class="px-4 py-3 text-green-700">Riesgo Bajo / Liderazgo</td>
+                                    <td class="px-4 py-3 text-gray-700">Relación estable, incentivos.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Frecuencia -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🔄 Frecuencia de Revisión</h3>
+                    <p class="text-gray-600 mb-8 text-center">
+                        La profundidad y frecuencia del análisis se adaptan según la criticidad del proveedor en nuestra cadena de valor.
+                    </p>
+                    <div class="space-y-6">
+                        <div class="flex items-center bg-blue-50 p-6 rounded-lg border border-blue-200">
+                            <div class="text-4xl mr-5">⚡</div>
+                            <div>
+                                <h4 class="text-xl font-semibold text-blue-800">Proveedores Críticos</h4>
+                                <p class="text-lg font-bold text-blue-700">Revisión Anual</p>
+                                <p class="text-gray-600 mt-1">Evaluación exhaustiva cada año y tras incidentes clave.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center bg-gray-50 p-6 rounded-lg border border-gray-200">
+                            <div class="text-4xl mr-5">⏳</div>
+                            <div>
+                                <h4 class="text-xl font-semibold text-gray-700">Proveedores No Críticos</h4>
+                                <p class="text-lg font-bold text-gray-600">Revisión Bienal</p>
+                                <p class="text-gray-600 mt-1">Evaluación cada dos años o tras cambios significativos (ej. denuncias).</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 4: Gobernanza del Modelo (Model Governance) -->
+        <section id="gobernanza" class="py-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Gobernanza del Modelo</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                Para asegurar su efectividad y credibilidad, el modelo opera bajo una supervisión clara y se alinea con estándares técnicos reconocidos internacionalmente.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">🏛️ Estándares Internacionales</h3>
+                    <p class="text-gray-600 mb-6">La metodología se alinea con marcos líderes para asegurar una comparabilidad técnica y robusta:</p>
+                    <h4 class="text-lg font-semibold text-teal-700 mb-2">Medio Ambiente</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600 mb-4">
+                        <li>GHG Protocol</li>
+                        <li>ISO 14001 / 14064</li>
+                        <li>Carbon Disclosure Project (CDP)</li>
+                        <li>Science Based Targets initiative (SBTi)</li>
+                    </ul>
+                    <h4 class="text-lg font-semibold text-teal-700 mb-2">Social y Gobernanza</h4>
+                    <ul class="list-disc list-inside space-y-1 text-gray-600">
+                        <li>Marcos de Derechos Humanos (ONU)</li>
+                        <li>Organización Internacional del Trabajo (OIT)</li>
+                        <li>ISO 45001 (Salud y Seguridad)</li>
+                        <li>ISO 37001 (Antisoborno)</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">👥 Rol de la Vertical de Gobernanza</h3>
+                    <p class="text-gray-600 mb-6">Un equipo interno de gobernanza tiene la supervisión final y la autoridad para tomar decisiones críticas sobre el modelo:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li>
+                            <strong>Validación Final:</strong> Aprueba las decisiones sobre proveedores identificados con riesgo elevado.
+                        </li>
+                        <li>
+                            <strong>Autoridad de Exclusión:</strong> Tiene la potestad de excluir proveedores que no cumplan con los mínimos legales y éticos exigibles.
+                        </li>
+                        <li>
+                            <strong>Definición de Umbrales:</strong> Participa en la definición de los umbrales críticos y las acciones correctivas de alto nivel.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 mt-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p>&copy; 2025 Compañía. Todos los derechos reservados.</p>
+            <p class="text-sm text-gray-400 mt-1">Dashboard Interactivo de Gestión de Riesgos ESG.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Lógica de Navegación (Scroll y Activo) ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sections = document.querySelectorAll('section[id]');
+
+            // Toggle menú móvil
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.querySelectorAll('svg').forEach(svg => svg.classList.toggle('hidden'));
+            });
+
+            // Clic en enlaces de navegación
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    
+                    // Cerrar menú móvil al hacer clic
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        mobileMenuButton.querySelectorAll('svg').forEach(svg => svg.classList.toggle('hidden'));
+                    }
+                });
+            });
+
+            // Resaltar enlace activo al hacer scroll
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.4
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('nav-link-active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('nav-link-active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+
+            // --- Lógica de Pestañas de Pilares ---
+            const pillarButtons = {
+                e: document.getElementById('btn-e'),
+                s: document.getElementById('btn-s'),
+                g: document.getElementById('btn-g')
+            };
+            const pillarContents = {
+                e: document.getElementById('content-e'),
+                s: document.getElementById('content-s'),
+                g: document.getElementById('content-g')
+            };
+
+            function showPillar(pillarKey) {
+                // Ocultar todos los contenidos
+                Object.values(pillarContents).forEach(content => {
+                    content.classList.add('hidden');
+                });
+                // Quitar clase activa a todos los botones
+                Object.values(pillarButtons).forEach(button => {
+                    button.classList.remove('pillar-button-active');
+                    button.classList.add('pillar-button-inactive');
+                });
+
+                // Mostrar el contenido seleccionado
+                pillarContents[pillarKey].classList.remove('hidden');
+                // Añadir clase activa al botón seleccionado
+                pillarButtons[pillarKey].classList.add('pillar-button-active');
+                pillarButtons[pillarKey].classList.remove('pillar-button-inactive');
+            }
+
+            pillarButtons.e.addEventListener('click', () => showPillar('e'));
+            pillarButtons.s.addEventListener('click', () => showPillar('s'));
+            pillarButtons.g.addEventListener('click', () => showPillar('g'));
+
+            // Mostrar el pilar 'E' por defecto
+            showPillar('e');
+
+            // --- Lógica del Gráfico (Chart.js) ---
+            const ctx = document.getElementById('scoringChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Riesgo Alto (0-3)', 
+                        'Riesgo Medio (4-7)', 
+                        'Riesgo Bajo (8-10)'
+                    ],
+                    datasets: [{
+                        label: 'Zonas de Riesgo',
+                        // Los datos representan el "ancho" de cada rango: 
+                        // 0-3 (3 puntos), 4-7 (4 puntos), 8-10 (3 puntos)
+                        data: [3, 4, 3],
+                        backgroundColor: [
+                            'rgb(239, 68, 68)',   // Rojo (Riesgo Alto)
+                            'rgb(245, 158, 11)',  // Ámbar (Riesgo Medio)
+                            'rgb(34, 197, 94)'  // Verde (Riesgo Bajo)
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed !== null) {
+                                        label += `${context.parsed} puntos en la escala`;
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        });
+    </script>
+</body>
+</html>
