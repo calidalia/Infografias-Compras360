@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Riesgo Geopolítico y Sectorial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Configuración Tailwind para colores del tema (Indigo) -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-indigo': {
+                            50: '#eef2ff',
+                            100: '#e0e7ff',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                            800: '#3730a3',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Clases de navegación adaptadas a INDIGO */
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-primary-indigo-50 hover:text-primary-indigo-700 transition-colors;
+        }
+        .nav-link-active {
+            @apply bg-primary-indigo-100 text-primary-indigo-700;
+        }
+        /* Clases de botones de pestañas adaptadas */
+        .pillar-button {
+            @apply w-full md:w-auto flex-grow px-3 py-3 text-sm md:text-base font-semibold rounded-lg shadow-sm focus:outline-none transition-all duration-300;
+        }
+        .pillar-button-active {
+            @apply bg-primary-indigo-600 text-white shadow-lg scale-[1.02];
+        }
+        .pillar-button-inactive {
+            @apply bg-white text-gray-700 hover:bg-gray-100;
+        }
+        /* Estilo para el botón de IA (Se mantiene púrpura) */
+        .ai-button {
+            @apply flex items-center justify-center bg-purple-600 text-white font-bold py-3 px-6 rounded-xl shadow-lg hover:bg-purple-700 transition duration-300 w-full mt-6 text-lg;
+        }
+        /* Dropdown customizado para los ratings de Coface */
+        .coface-select {
+            @apply w-full p-2 border border-gray-300 rounded-md focus:ring-primary-indigo-500 focus:border-primary-indigo-500 text-lg appearance-none bg-white pr-8;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%234f46e5'%3E%3Cpath fill-rule='evenodd' d='M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z' clip-rule='evenodd'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1.5em;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Navbar -->
+    <header class="sticky top-0 z-50 bg-white/95 shadow-sm backdrop-blur-sm">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-primary-indigo-700">Riesgo</span>
+                    <span class="text-xl font-medium text-gray-600 ml-2 hidden sm:block">Geopolítico y Sectorial</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="nav-link nav-link-active">Inicio</a>
+                        <a href="#subdimensiones" class="nav-link">Componentes</a>
+                        <a href="#evaluacion" class="nav-link">Scoring COFACE</a>
+                        <a href="#gobernanza" class="nav-link">Gobernanza</a>
+                    </div>
+                </div>
+                <!-- Botón de menú móvil -->
+                <div class="md:hidden">
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="nav-link block nav-link-active">Inicio</a>
+                <a href="#subdimensiones" class="nav-link block">Componentes</a>
+                <a href="#evaluacion" class="nav-link block">Scoring COFACE</a>
+                <a href="#gobernanza" class="nav-link block">Gobernanza</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Sección 1: Introducción -->
+        <section id="inicio" class="text-center pt-16 pb-20">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Vertical de Riesgo Geopolítico y Sectorial
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Se evalúa la exposición del proveedor a **factores exógenos** (políticos, económicos, sociales) de su país/región y la **vulnerabilidad** estructural de su industria (sector).
+            </p>
+            <div class="mt-8">
+                <span class="inline-flex items-center rounded-full bg-primary-indigo-100 px-3 py-1.5 text-lg font-medium text-primary-indigo-800">
+                    Evaluación 100% Datos Externos Estandarizados (Coface)
+                </span>
+            </div>
+        </section>
+
+        <!-- Sección 2: Componentes Clave -->
+        <section id="subdimensiones" class="py-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Componentes del Riesgo Exógeno</h2>
+            <p class="text-lg text-gray-600 text-center max-w-4xl mx-auto mb-12">
+                Este riesgo se construye sobre métricas externas objetivas que miden la estabilidad y el entorno operativo.
+            </p>
+            
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                <button id="btn-pais" class="pillar-button pillar-button-active" data-pillar="Riesgo País (Coface)">
+                    <span class="text-xl mr-2"> 🗺️ </span> Riesgo País
+                </button>
+                <button id="btn-sectorial" class="pillar-button pillar-button-inactive" data-pillar="Riesgo Sectorial (Coface)">
+                    <span class="text-xl mr-2"> 🏭 </span> Riesgo Sectorial
+                </button>
+                <button id="btn-geopolitico" class="pillar-button pillar-button-inactive" data-pillar="Impacto Geopolítico Directo">
+                    <span class="text-xl mr-2"> ⚔️ </span> Impacto Geopolítico
+                </button>
+                <button id="btn-cadenasuministro" class="pillar-button pillar-button-inactive" data-pillar="Dependencia de la Cadena de Suministro">
+                    <span class="text-xl mr-2"> 🔗 </span> Cadena de Suministro
+                </button>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg transition-all duration-300 min-h-[300px]">
+                <!-- Contenido Riesgo País -->
+                <div id="content-pais">
+                    <h3 class="text-2xl font-bold text-primary-indigo-700 mb-4">🗺️ Riesgo País (Coface)</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Clasificación que integra factores macroeconómicos, financieros, políticos y de entorno empresarial del país de origen del proveedor.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Variables Clave:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Estabilidad política e institucional.</li>
+                        <li>Entorno macroeconómico y riesgo de impago soberano.</li>
+                        <li>Transparencia regulatoria y facilidad para hacer negocios.</li>
+                    </ul>
+                </div>
+                
+                <!-- Contenido Riesgo Sectorial -->
+                <div id="content-sectorial" class="hidden">
+                    <h3 class="text-2xl font-bold text-primary-indigo-700 mb-4">🏭 Riesgo Sectorial (Coface)</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Evalúa la solidez y vulnerabilidad de la industria específica en la que opera el proveedor (ej. agroalimentario, tecnológico, logístico).
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Variables Clave:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Sensibilidad al ciclo económico y volatilidad de precios de materias primas.</li>
+                        <li>Marco regulatorio sectorial específico.</li>
+                        <li>Intensidad competitiva y concentración de mercado.</li>
+                    </ul>
+                </div>
+                
+                <!-- Contenido Impacto Geopolítico -->
+                <div id="content-geopolitico" class="hidden">
+                    <h3 class="text-2xl font-bold text-primary-indigo-700 mb-4">⚔️ Impacto Geopolítico Directo</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Análisis de factores externos que pueden impactar directamente la continuidad contractual del proveedor, independientemente de su rating base.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Variables Clave:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Existencia de sanciones internacionales o embargos.</li>
+                        <li>Conflictos armados o inestabilidad social severa en la región.</li>
+                        <li>Barreras comerciales o arancelarias.</li>
+                    </ul>
+                </div>
+                
+                <!-- Contenido Cadena de Suministro -->
+                <div id="content-cadenasuministro" class="hidden">
+                    <h3 class="text-2xl font-bold text-primary-indigo-700 mb-4">🔗 Dependencia de la Cadena de Suministro</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Evaluación de la resiliencia del proveedor frente a interrupciones en el suministro de materias primas o componentes críticos debido a factores exógenos.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Variables Clave:</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Diversificación de fuentes de aprovisionamiento.</li>
+                        <li>Existencia de inventario de seguridad.</li>
+                        <li>Riesgo geopolítico de sus propios proveedores clave.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sección 3: Evaluación y Plan de IA -->
+        <section id="evaluacion" class="py-16 scroll-mt-16 bg-gray-100 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Scoring Basado en Calificación COFACE</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                El score se traduce directamente del Riesgo País (A1 a E) de Coface, con Riesgo Sectorial (L a VH) como modulador.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Gráfico de Calificaciones -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">📊 Escala de Riesgo País (Coface)</h3>
+                    <p class="text-gray-600 mb-6 text-center">
+                        La clasificación alfabética establece el nivel base del riesgo geopolítico.
+                    </p>
+                    <div class="chart-container mb-8">
+                        <canvas id="scoringChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Simulación y Plan de Acción IA -->
+                <div class="space-y-6">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center md:text-left">Niveles de Riesgo y Plan de IA</h3>
+                    
+                    <!-- Selector de Riesgo País -->
+                    <div class="bg-gray-200 p-4 rounded-lg shadow-inner">
+                        <label for="coface-input" class="block text-sm font-medium text-gray-700 mb-2">Simular Rating de Riesgo País (Coface):</label>
+                        <select id="coface-input" class="coface-select">
+                            <option value="A1">A1 (Muy Bajo)</option>
+                            <option value="A2">A2 (Bajo)</option>
+                            <option value="A3">A3 (Bastante Moderado)</option>
+                            <option value="A4">A4 (Moderado)</option>
+                            <option value="B" selected>B (Bastante Alto)</option>
+                            <option value="C">C (Alto)</option>
+                            <option value="D">D (Muy Alto)</option>
+                            <option value="E">E (Extremo)</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Display del Nivel de Riesgo -->
+                    <div id="risk-level-display" class="bg-yellow-100 p-6 rounded-xl border-l-4 border-yellow-500 shadow-sm">
+                        <!-- Contenido dinámico aquí -->
+                        <h4 class="text-xl font-bold text-yellow-800">Rating: B (Bastante Alto)</h4>
+                        <p class="text-gray-700 mt-2 text-sm">Existe inestabilidad macroeconómica o política significativa. **Riesgo ALTO.**</p>
+                        <p class="text-yellow-700 font-semibold mt-1">Acción: Exigir cobertura de impago y plan de diversificación de suministros.</p>
+                    </div>
+
+                    <!-- Botón IA -->
+                    <button id="generate-plan-button" class="ai-button">
+                        ✨ Generar Estrategia de Mitigación (IA)
+                    </button>
+                    
+                    <!-- Área de Resultados de IA -->
+                    <div id="ai-result-area" class="mt-4 bg-white p-6 rounded-xl shadow-md hidden">
+                        <h4 class="text-xl font-bold text-purple-700 mb-3">Estrategia de Mitigación (Generada por IA):</h4>
+                        <div id="ai-plan-content" class="text-gray-700 space-y-4">
+                            <!-- Indicador de carga -->
+                            <div class="flex items-center justify-center h-24 text-gray-500" id="ai-loading-indicator">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-purple-500 hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <span>Seleccione un rating y haga clic en "Generar Estrategia"</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Sección 4: Gobernanza y Notas Técnicas -->
+        <section id="gobernanza" class="py-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Gobernanza y Fuentes de Datos</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                La gobernanza se centra en la priorización estratégica y la verificación de datos externos.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">👥 Responsables Clave del Proceso</h3>
+                    <p class="text-gray-600 mb-6">El modelo requiere la participación activa de las siguientes áreas:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li>
+                            <strong>Finanzas / Tesorería:</strong> Integración de riesgo país/impago y cobertura de crédito.
+                        </li>
+                        <li>
+                            <strong>Compras / Estrategia:</strong> Decisiones sobre diversificación geográfica y selección de proveedores.
+                        </li>
+                        <li>
+                            <strong>Compliance:</strong> Monitoreo de sanciones internacionales y cambios regulatorios.
+                        </li>
+                        <li>
+                            <strong>Dirección:</strong> Definición de umbrales críticos de exposición geopolítica.
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">⚙️ Observaciones Técnicas y Fuentes</h3>
+                    <p class="text-gray-600 mb-6">Puntos cruciales para la robustez del sistema de evaluación:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li>
+                            <strong>Fuente Principal:</strong> Coface (Country & Sector Risk Assessments) para datos estandarizados.
+                        </li>
+                        <li>
+                            <strong>Frecuencia de Revisión:</strong> Anual (proveedores críticos) o bienal (no críticos).
+                        </li>
+                        <li>
+                            <strong>Objetividad:</strong> El uso de métricas externas asegura una medida homogénea del riesgo para todos los proveedores.
+                        </li>
+                        <li>
+                            <strong>Priorización:</strong> Ayuda a decidir dónde diversificar riesgos y establecer planes de contingencia en regiones sensibles.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 mt-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p>&copy; 2025 Compañía. Todos los derechos reservados.</p>
+            <p class="text-sm text-gray-400 mt-1">Dashboard Interactivo de Riesgo Geopolítico y Sectorial.</p>
+        </div>
+    </footer>
+
+    <!-- Scripts de Interacción y IA -->
+    <script>
+        // Configuración de la API (vacía por el entorno de ejecución)
+        const apiKey = ""; 
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+        // Definición de niveles de riesgo Geopolítico y Sectorial (adaptado a Coface)
+        const riskLevels = [
+            { rating: 'A1', name: 'Muy Bajo', color: 'teal', action: 'Homologación Preferente. Ninguna acción requerida por riesgo país. Enfocarse en riesgo sectorial.', score: '9-10' },
+            { rating: 'A2', name: 'Bajo', color: 'green', action: 'Homologación estándar. Monitoreo semestral del rating Coface.', score: '8' },
+            { rating: 'A3', name: 'Bastante Moderado', color: 'green', action: 'Homologación estándar. Monitoreo trimestral del rating Coface.', score: '7' },
+            { rating: 'A4', name: 'Moderado', color: 'yellow', action: 'Revisión y Plan de Contingencia por volatilidad de la región.', score: '6' },
+            { rating: 'B', name: 'Bastante Alto', color: 'yellow', action: 'Exigir cobertura de impago y plan de diversificación de suministros.', score: '5' },
+            { rating: 'C', name: 'Alto', color: 'orange', action: 'Revisión por Comité de Riesgo. Reducir exposición y evaluar alternativas de proveedor.', score: '4' },
+            { rating: 'D', name: 'Muy Alto', color: 'red', action: 'Restricción de onboarding. Reducción inmediata de volumen contractual y exigencia de garantías.', score: '3' },
+            { rating: 'E', name: 'Extremo', color: 'red', action: 'Exclusión o Plan de Salida INMEDIATO. Prohibición de nuevo negocio.', score: '0-2' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Elementos de la Interfaz IA 1 (Plan de Acción) ---
+            const cofaceInput = document.getElementById('coface-input');
+            const riskLevelDisplay = document.getElementById('risk-level-display');
+            const generatePlanButton = document.getElementById('generate-plan-button');
+            const aiResultArea = document.getElementById('ai-result-area');
+            const aiPlanContent = document.getElementById('ai-plan-content');
+            const aiLoadingIndicator = document.getElementById('ai-loading-indicator');
+            const scoringChartCanvas = document.getElementById('scoringChart');
+
+            // --- Funciones de Utilidad ---
+
+            // Función de retardo exponencial para la API
+            async function fetchWithRetry(url, options, maxRetries = 5) {
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (response.status !== 429) return response; 
+                        console.log(`Rate limit (429) o error inesperado. Reintento en ${2 ** i * 1000}ms...`);
+                        await new Promise(resolve => setTimeout(resolve, 2 ** i * 1000));
+                    } catch (error) {
+                        console.error('Error de red:', error);
+                        if (i === maxRetries - 1) throw error;
+                        await new Promise(resolve => setTimeout(resolve, 2 ** i * 1000));
+                    }
+                }
+                throw new Error("Máximo de reintentos de API excedido.");
+            }
+
+            // Función para actualizar la tarjeta de riesgo (IA 1)
+            function updateRiskCard(rating) {
+                const level = riskLevels.find(l => l.rating === rating);
+                if (!level) return;
+
+                const colorClass = level.color === 'teal' ? 'bg-teal-100 border-teal-500 text-teal-800' : 
+                                   level.color === 'green' ? 'bg-green-100 border-green-500 text-green-800' :
+                                   level.color === 'yellow' ? 'bg-yellow-100 border-yellow-500 text-yellow-800' :
+                                   level.color === 'orange' ? 'bg-orange-100 border-orange-500 text-orange-800' :
+                                   'bg-red-100 border-red-500 text-red-800';
+                
+                const actionColorClass = level.color === 'teal' ? 'text-teal-700' : 
+                                         level.color === 'green' ? 'text-green-700' :
+                                         level.color === 'yellow' ? 'text-yellow-700' :
+                                         level.color === 'orange' ? 'text-orange-700' :
+                                         'text-red-700';
+
+                riskLevelDisplay.className = `p-6 rounded-xl border-l-4 shadow-sm ${colorClass}`;
+                riskLevelDisplay.innerHTML = `
+                    <h4 class="text-xl font-bold ${colorClass.split(' ')[4]}">Rating: ${level.rating} (${level.name})</h4>
+                    <p class="text-gray-700 mt-2 text-sm">Score asociado: ${level.score}</p>
+                    <p class="font-semibold mt-3 ${actionColorClass}">Acción: ${level.action}</p>
+                `;
+            }
+
+            // Función genérica para convertir lista Markdown a HTML
+            function markdownListToHtml(text) {
+                const listItems = text.split('\n')
+                    .filter(line => line.startsWith('* ') || line.startsWith('- ') || line.startsWith('1. ') || line.startsWith('2. '))
+                    .map(line => {
+                        if (line.startsWith('* ') || line.startsWith('- ')) {
+                            return `<li>${line.substring(2).trim()}</li>`;
+                        }
+                        if (line.match(/^\d+\.\s/)) {
+                            return `<li>${line.substring(line.indexOf('.') + 1).trim()}</li>`;
+                        }
+                        return `<li>${line.trim()}</li>`;
+                    })
+                    .join('');
+                // Usar lista ordenada si parece un plan, sino desordenada
+                if (text.includes('1.') && text.includes('2.')) {
+                    return `<ol class="list-decimal list-inside space-y-2 text-base">${listItems}</ol>`;
+                }
+                return listItems ? `<ul class="list-disc list-inside space-y-2 text-base">${listItems}</ul>` : `<p>${text}</p>`;
+            }
+
+
+            // --- Manejadores de Eventos IA 1 (Plan de Acción) ---
+
+            cofaceInput.addEventListener('change', (e) => {
+                const rating = e.target.value;
+                updateRiskCard(rating);
+                
+                // Reinicia el área de resultados de IA al cambiar el rating
+                aiResultArea.classList.add('hidden');
+                aiPlanContent.innerHTML = '';
+                aiLoadingIndicator.classList.remove('hidden');
+                aiLoadingIndicator.querySelector('svg').classList.add('hidden');
+                aiLoadingIndicator.querySelector('span').textContent = 'Seleccione un rating y haga clic en "Generar Estrategia"';
+            });
+
+            // Llamada al API de Gemini para generar el plan de mejora operacional
+            generatePlanButton.addEventListener('click', async () => {
+                const rating = cofaceInput.value;
+                const currentLevel = riskLevels.find(l => l.rating === rating);
+                
+                if (!currentLevel) return;
+
+                aiResultArea.classList.remove('hidden');
+                aiPlanContent.innerHTML = '';
+                aiLoadingIndicator.classList.remove('hidden');
+                aiLoadingIndicator.querySelector('svg').classList.remove('hidden');
+                aiLoadingIndicator.querySelector('span').textContent = 'Generando Estrategia de Mitigación con Gemini...';
+                
+                generatePlanButton.disabled = true;
+
+                const systemPrompt = `Actúa como un estratega de gestión de riesgo geopolítico y de cadena de suministro. Tu tarea es generar una estrategia de mitigación CONCRETA y ACCIONABLE de 5 puntos (en formato de lista ordenada Markdown: 1., 2., 3., etc.) para un proveedor con el Riesgo País de Coface: ${currentLevel.rating} (${currentLevel.name}). La estrategia debe abordar la diversificación, monitoreo y contractualización. Sé profesional, directo y genera solo la lista ordenada Markdown.`;
+                
+                const userQuery = `Genera un plan de 5 acciones estratégicas para mitigar la exposición de un proveedor en un país con rating de Riesgo País: ${currentLevel.rating}.`;
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: {
+                        parts: [{ text: systemPrompt }]
+                    },
+                };
+
+                try {
+                    const response = await fetchWithRetry(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    
+                    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                    
+                    const result = await response.json();
+                    const text = result.candidates?.[0]?.content?.parts?.[0]?.text || "Error al generar el plan de acción.";
+                    
+                    aiPlanContent.innerHTML = markdownListToHtml(text);
+
+                } catch (error) {
+                    console.error('Error en la llamada a la API de Gemini:', error);
+                    aiPlanContent.innerHTML = '<p class="text-red-600">⚠️ Error al conectar con el servicio de IA. Intente de nuevo.</p>';
+                } finally {
+                    aiLoadingIndicator.querySelector('svg').classList.add('hidden');
+                    aiLoadingIndicator.classList.add('hidden');
+                    generatePlanButton.disabled = false;
+                }
+            });
+
+
+            // --- Lógica de Gráfico ---
+            const chartLabels = riskLevels.map(l => `${l.rating} (${l.name})`);
+            const chartBackgrounds = riskLevels.map(l => {
+                if (l.color === 'teal') return 'rgba(20, 184, 166, 0.8)';
+                if (l.color === 'green') return 'rgba(16, 185, 129, 0.8)';
+                if (l.color === 'yellow') return 'rgba(234, 179, 8, 0.8)';
+                if (l.color === 'orange') return 'rgba(249, 115, 22, 0.8)';
+                return 'rgba(239, 68, 68, 0.8)';
+            });
+            const chartDataValues = [10, 9, 8, 7, 5, 4, 3, 1]; // Score proxy for visualization
+
+            new Chart(scoringChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: chartLabels,
+                    datasets: [{
+                        label: 'Score de Riesgo (Proxy)',
+                        data: chartDataValues,
+                        backgroundColor: chartBackgrounds,
+                        borderColor: chartBackgrounds.map(c => c.replace('0.8', '1')),
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Hace el gráfico horizontal
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: {
+                                display: true,
+                                text: 'Score de Riesgo (10=Mínimo Riesgo)',
+                                font: { weight: 'bold' }
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Rating COFACE',
+                                font: { weight: 'bold' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        }
+                    }
+                }
+            });
+
+
+            // --- Lógica de Navegación y Pestañas ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sections = document.querySelectorAll('section[id]');
+            
+            // Toggle menú móvil
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.querySelector('svg:first-child').classList.toggle('hidden');
+                mobileMenuButton.querySelector('svg:last-child').classList.toggle('hidden');
+            });
+
+            // Pestañas de Subdimensiones
+            const pillarButtons = document.querySelectorAll('.pillar-button');
+            const contentDivs = {
+                'Riesgo País (Coface)': document.getElementById('content-pais'),
+                'Riesgo Sectorial (Coface)': document.getElementById('content-sectorial'),
+                'Impacto Geopolítico Directo': document.getElementById('content-geopolitico'),
+                'Dependencia de la Cadena de Suministro': document.getElementById('content-cadenasuministro')
+            };
+
+            pillarButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetPillar = button.getAttribute('data-pillar');
+
+                    // Desactivar todos los botones y ocultar contenidos
+                    pillarButtons.forEach(btn => {
+                        btn.classList.remove('pillar-button-active');
+                        btn.classList.add('pillar-button-inactive');
+                    });
+                    Object.values(contentDivs).forEach(div => div.classList.add('hidden'));
+
+                    // Activar el botón seleccionado y mostrar su contenido
+                    button.classList.add('pillar-button-active');
+                    button.classList.remove('pillar-button-inactive');
+                    contentDivs[targetPillar].classList.remove('hidden');
+                });
+            });
+
+            // Inicializar la tarjeta de riesgo y el contenido al cargar la página
+            updateRiskCard(cofaceInput.value);
+
+            // Resaltar el enlace de navegación activo al hacer scroll
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('nav-link-active');
+                            link.classList.add('nav-link');
+                            if (link.getAttribute('href') === `#${entry.target.id}`) {
+                                link.classList.add('nav-link-active');
+                                link.classList.remove('nav-link');
+                            }
+                        });
+                    }
+                });
+            }, {
+                rootMargin: "-25% 0px -75% 0px"
+            });
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
