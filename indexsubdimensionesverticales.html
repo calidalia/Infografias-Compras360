@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Esquema Visual de Riesgos y ESG</title>
+<style>
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f0f2f5;
+    margin: 0;
+    padding: 20px;
+    color: #333;
+}
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 30px;
+}
+.header-section {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    margin-bottom: 30px;
+    text-align: center;
+}
+.weights-container {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-top: 15px;
+}
+.weight-badge {
+    background-color: #e8f4fd;
+    color: #2980b9;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: bold;
+    border: 1px solid #bde0fe;
+}
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 25px;
+}
+.card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+.card-header {
+    padding: 15px 20px;
+    color: white;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.card-body {
+    padding: 20px;
+}
+.sub-item {
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px dashed #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.sub-item:last-child {
+    border-bottom: none;
+}
+.item-name {
+    font-weight: 500;
+}
+.item-weight {
+    font-size: 0.85em;
+    color: #7f8c8d;
+    background-color: #f8f9fa;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+/* Colores por Vertical */
+.financiero .card-header { background-color: #f1c40f; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,0.1); }
+.ciber .card-header { background-color: #e67e22; }
+.operacional .card-header { background-color: #3498db; }
+.reputacional .card-header { background-color: #9b59b6; }
+.esg-env .card-header { background-color: #2ecc71; }
+.esg-soc .card-header { background-color: #16a085; }
+.esg-gov .card-header { background-color: #2c3e50; }
+
+.section-title {
+    font-size: 1.5em;
+    color: #34495e;
+    margin: 40px 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #dfe6e9;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🔍 Esquema de Modelo de Riesgos y ESG</h1>
+
+    <!-- Sección de Ponderación Global de Riesgos -->
+    <div class="header-section">
+        <h2>📊 Ponderación Global de Riesgos</h2>
+        <div class="weights-container">
+            <div class="weight-badge">💰 Financiero: 40%</div>
+            <div class="weight-badge">🛡️ Ciberseguridad: 20%</div>
+            <div class="weight-badge">⚙️ Operacional: 20%</div>
+            <div class="weight-badge">📣 Reputacional: 20%</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">1. Verticales de Riesgo</h2>
+    <div class="grid-container">
+        
+        <!-- Financiero -->
+        <div class="card financiero">
+            <div class="card-header">
+                <span>💰 Financiero</span>
+                <span>40%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Score Riesgo Deudor (COFACE)</span> <span class="item-weight">Principal</span></div>
+                <div class="sub-item"><span class="item-name">Probabilidad de Impago</span></div>
+                <div class="sub-item"><span class="item-name">Ratios de Rentabilidad</span></div>
+                <div class="sub-item"><span class="item-name">Estructura Financiera</span></div>
+                <div class="sub-item"><span class="item-name">Solvencia y Liquidez</span></div>
+                <div class="sub-item"><span class="item-name">Índice de Pago (LPI)</span></div>
+                <div class="sub-item"><span class="item-name">Riesgo País / Sector</span></div>
+            </div>
+        </div>
+
+        <!-- Ciberseguridad -->
+        <div class="card ciber">
+            <div class="card-header">
+                <span>🛡️ Ciberseguridad</span>
+                <span>20%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Inventario Tecnológico</span> <span class="item-weight">20%</span></div>
+                <div class="sub-item"><span class="item-name">Gestión de Privilegios</span> <span class="item-weight">20%</span></div>
+                <div class="sub-item"><span class="item-name">Gestión de Vulnerabilidades</span> <span class="item-weight">20%</span></div>
+                <div class="sub-item"><span class="item-name">Backups y Recuperación</span> <span class="item-weight">20%</span></div>
+                <div class="sub-item"><span class="item-name">Cumplimiento Normativo</span> <span class="item-weight">20%</span></div>
+            </div>
+        </div>
+
+        <!-- Operacional -->
+        <div class="card operacional">
+            <div class="card-header">
+                <span>⚙️ Operacional</span>
+                <span>20%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Capacidad Productiva</span> <span class="item-weight">15%</span></div>
+                <div class="sub-item"><span class="item-name">Infraestructura Crítica</span> <span class="item-weight">15%</span></div>
+                <div class="sub-item"><span class="item-name">Planificación y Control</span> <span class="item-weight">10%</span></div>
+                <div class="sub-item"><span class="item-name">Logística y Distribución</span> <span class="item-weight">10%</span></div>
+                <div class="sub-item"><span class="item-name">Gestión de Incidencias (CAPA)</span> <span class="item-weight">15%</span></div>
+                <div class="sub-item"><span class="item-name">Planes de Continuidad (BCP)</span> <span class="item-weight">8%</span></div>
+                <div class="sub-item"><span class="item-name">Dependencia de Terceros</span> <span class="item-weight">15%</span></div>
+            </div>
+        </div>
+
+        <!-- Reputacional -->
+        <div class="card reputacional">
+            <div class="card-header">
+                <span>📣 Reputacional</span>
+                <span>20%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Historial de Sanciones</span> <span class="item-weight">35%</span></div>
+                <div class="sub-item"><span class="item-name">Antecedentes Legales</span> <span class="item-weight">30%</span></div>
+                <div class="sub-item"><span class="item-name">Asociación Empresas Polémicas</span> <span class="item-weight">10%</span></div>
+                <div class="sub-item"><span class="item-name">Opiniones y Referencias</span> <span class="item-weight">5%</span></div>
+                <div class="sub-item"><span class="item-name">Reputación en Medios</span> <span class="item-weight">10%</span></div>
+                <div class="sub-item"><span class="item-name">Gestión de Crisis Anteriores</span> <span class="item-weight">10%</span></div>
+            </div>
+        </div>
+    </div>
+
+    <h2 class="section-title">2. Verticales ESG (Sostenibilidad)</h2>
+    <div class="header-section">
+        <h3>⚖️ Ponderación ESG: Environmental (35%) | Social (35%) | Governance (30%)</h3>
+    </div>
+
+    <div class="grid-container">
+        <!-- Environmental -->
+        <div class="card esg-env">
+            <div class="card-header">
+                <span>🌍 Environmental</span>
+                <span>35%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Cambio Climático / Descarbonización</span> <span class="item-weight">20%</span></div>
+                <div class="sub-item"><span class="item-name">Gestión del Agua</span> <span class="item-weight">15%</span></div>
+                <div class="sub-item"><span class="item-name">Residuos y Efluentes</span> <span class="item-weight">15%</span></div>
+                <div class="sub-item"><span class="item-name">Economía Circular</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Biodiversidad</span> <span class="item-weight">12%</span></div>
+                <div class="sub-item"><span class="item-name">Suelo y Fertilidad</span> <span class="item-weight">10%</span></div>
+                <div class="sub-item"><span class="item-name">Cumplimiento Ambiental</span> <span class="item-weight">15%</span></div>
+            </div>
+        </div>
+
+        <!-- Social -->
+        <div class="card esg-soc">
+            <div class="card-header">
+                <span>👥 Social</span>
+                <span>35%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Condiciones Laborales</span> <span class="item-weight">17%</span></div>
+                <div class="sub-item"><span class="item-name">Salud y Seguridad</span> <span class="item-weight">17%</span></div>
+                <div class="sub-item"><span class="item-name">Igualdad y Diversidad</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Bienestar Animal</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Gestión Subcontratación</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Historial Sanciones Sociales</span> <span class="item-weight">18%</span></div>
+                <div class="sub-item"><span class="item-name">Relación Comunidad</span> <span class="item-weight">9%</span></div>
+            </div>
+        </div>
+
+        <!-- Governance -->
+        <div class="card esg-gov">
+            <div class="card-header">
+                <span>🏛️ Governance</span>
+                <span>30%</span>
+            </div>
+            <div class="card-body">
+                <div class="sub-item"><span class="item-name">Base Legal y Societaria</span> <span class="item-weight">16%</span></div>
+                <div class="sub-item"><span class="item-name">Ética y Anticorrupción</span> <span class="item-weight">16%</span></div>
+                <div class="sub-item"><span class="item-name">Compras Sostenibles</span> <span class="item-weight">16%</span></div>
+                <div class="sub-item"><span class="item-name">Cumplimiento Normativo</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Trazabilidad y Control</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Cumplimiento Contratos</span> <span class="item-weight">13%</span></div>
+                <div class="sub-item"><span class="item-name">Historial Legal</span> <span class="item-weight">13%</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
