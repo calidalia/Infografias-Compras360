@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Riesgo Financiero en Proveedores</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- MISMO ESTILO: Se mantiene la paleta de Neutros + Acento Teal, con el gráfico usando la gama Rojo/Ámbar/Verde. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        /* Clases de navegación reutilizadas */
+        .nav-link {
+            @apply px-3 py-2 rounded-md text-sm font-medium text-gray-700 hover:bg-teal-50 hover:text-teal-700 transition-colors;
+        }
+        .nav-link-active {
+            @apply bg-teal-100 text-teal-700;
+        }
+        /* Clases de botones de pestañas reutilizadas */
+        .pillar-button {
+            @apply w-full md:w-1/3 px-4 py-3 text-lg font-semibold rounded-lg shadow-sm focus:outline-none transition-all duration-300;
+        }
+        .pillar-button-active {
+            @apply bg-teal-600 text-white shadow-lg scale-105;
+        }
+        .pillar-button-inactive {
+            @apply bg-white text-gray-700 hover:bg-gray-100;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <!-- Header / Navigation -->
+    <!-- Estructura de navegación idéntica, solo se cambian los href y el título -->
+    <header class="sticky top-0 z-50 bg-white/95 shadow-sm backdrop-blur-sm">
+        <nav class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex-shrink-0 flex items-center">
+                    <span class="text-2xl font-bold text-teal-700">Riesgo</span>
+                    <span class="text-xl font-medium text-gray-600 ml-2 hidden sm:block">Financiero</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#inicio" class="nav-link nav-link-active">Inicio</a>
+                        <a href="#subdimensiones" class="nav-link">Dimensiones</a>
+                        <a href="#evaluacion" class="nav-link">Evaluación</a>
+                        <a href="#implementacion" class="nav-link">Implementación</a>
+                    </div>
+                </div>
+                <div class="md:hidden">
+                    <!-- Botón de menú móvil (misma lógica JS) -->
+                    <button id="mobile-menu-button" type="button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white" aria-controls="mobile-menu" aria-expanded="false">
+                        <span class="sr-only">Abrir menú principal</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <!-- Menú móvil (misma lógica JS) -->
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#inicio" class="nav-link block nav-link-active">Inicio</a>
+                <a href="#subdimensiones" class="nav-link block">Dimensiones</a>
+                <a href="#evaluacion" class="nav-link block">Evaluación</a>
+                <a href="#implementacion" class="nav-link block">Implementación</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+
+        <!-- Section 1: Inicio (Home) -->
+        <!-- Adaptada con la Definición Operativa del nuevo documento -->
+        <section id="inicio" class="text-center pt-16 pb-20">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
+                Modelo de Gestión de Riesgo Financiero
+            </h1>
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                Se refiere a la posibilidad de que un proveedor experimente dificultades económicas o de solvencia que afecten su capacidad para cumplir con sus obligaciones contractuales, mantener la calidad y garantizar la continuidad de su actividad.
+            </p>
+        </section>
+
+        <!-- Section 2: Subdimensiones Clave -->
+        <!-- Se reutiliza el componente de 3 pestañas para las 3 Subdimensiones Financieras -->
+        <section id="subdimensiones" class="py-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Subdimensiones Clave</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                Obtenemos la situación financiera global del proveedor enfocándonos en tres áreas principales de análisis. Haga clic en cada dimensión para ver los indicadores clave (KRI) que la componen.
+            </p>
+            
+            <div class="flex flex-col md:flex-row justify-center gap-4 mb-8">
+                <!-- Se actualizan los IDs, Texto e Iconos de los botones -->
+                <button id="btn-rentabilidad" class="pillar-button pillar-button-active">
+                    <span class="text-2xl mr-2">📈</span> Rentabilidad
+                </button>
+                <button id="btn-estructura" class="pillar-button pillar-button-inactive">
+                    <span class="text-2xl mr-2">🏗️</span> Estructura Financiera
+                </button>
+                <button id="btn-solvencia" class="pillar-button pillar-button-inactive">
+                    <span class="text-2xl mr-2">💧</span> Solvencia y Liquidez
+                </button>
+            </div>
+
+            <div class="bg-white p-8 rounded-xl shadow-lg transition-all duration-300 min-h-[300px]">
+                <!-- Contenido Pestaña 1: Rentabilidad -->
+                <div id="content-rentabilidad">
+                    <h3 class="text-2xl font-bold text-green-700 mb-4">📈 Rentabilidad</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Mide la capacidad de la empresa para generar ganancias a partir de sus ventas, activos y capital.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Indicadores Clave (KRI):</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Evolución de las Ventas</li>
+                        <li>Evolución ingresos netos</li>
+                        <li>Rentabilidad de las Ventas</li>
+                        <li>Rentabilidad sobre fondos propios (ROE)</li>
+                        <li>Rendimiento de los activos (ROA)</li>
+                    </ul>
+                </div>
+                <!-- Contenido Pestaña 2: Estructura Financiera -->
+                <div id="content-estructura" class="hidden">
+                    <h3 class="text-2xl font-bold text-blue-700 mb-4">🏗️ Estructura Financiera</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Analiza la composición del balance de la empresa, incluyendo su capital, necesidades operativas y ciclos de pago y cobro.
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Indicadores Clave (KRI):</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Evolución de los Fondos Propios</li>
+                        <li>Índice de capital</li>
+                        <li>Necesidades de Capital Circulante (Días)</li>
+                        <li>Días de ventas pendientes de cobro (DSO)</li>
+                        <li>Período medio de Pago (DPO)</li>
+                        <li>Período de Conversión del Inventario (DIO)</li>
+                    </ul>
+                </div>
+                <!-- Contenido Pestaña 3: Solvencia y Liquidez -->
+                <div id="content-solvencia" class="hidden">
+                    <h3 class="text-2xl font-bold text-indigo-700 mb-4">💧 Solvencia y Liquidez</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Evalúa la capacidad de la empresa para cumplir con sus obligaciones de deuda a corto (liquidez) y largo plazo (solvencia).
+                    </p>
+                    <h4 class="text-xl font-semibold text-gray-800 mb-3">Indicadores Clave (KRI):</h4>
+                    <ul class="list-disc list-inside space-y-2 text-gray-600">
+                        <li>Liquidez (Índice de Solvencia / Quick Ratio)</li>
+                        <li>Apalancamiento (Deuda / Fondos Propios)</li>
+                        <li>Liquidez (Ratio de Efectivo)</li>
+                        <li>Endeudamiento (Tasa de Endeudamiento)</li>
+                        <li>Tasa de Endeudamiento Global</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Evaluación -->
+        <!-- Se reutiliza el grid de 2 columnas. Se actualiza el Chart.js y las tarjetas. -->
+        <section id="evaluacion" class="py-16 scroll-mt-16 bg-gray-100 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Evaluación y Frecuencia</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                El modelo utiliza una escala de puntuación detallada inspirada en el credit scoring y un sistema de monitoreo continuo basado en fuentes de datos fiables.
+            </p>
+            
+            <div class="grid md:grid-cols-2 gap-12 items-start">
+                
+                <!-- Columna 1: Scoring -->
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">📏 Escala de Scoring (0-10)</h3>
+                    <p class="text-gray-600 mb-6 text-center">
+                        Clasificación rápida para priorización, basada en benchmarks de agencias de calificación.
+                    </p>
+                    <!-- El canvas se actualiza con el nuevo gráfico de 5 niveles -->
+                    <div class="chart-container mb-8">
+                        <canvas id="scoringChart"></canvas>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <!-- La tabla se actualiza con los 5 nuevos niveles de riesgo -->
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Score</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Riesgo Asociado</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Definición</th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white divide-y divide-gray-200">
+                                <tr class="bg-red-50">
+                                    <td class="px-4 py-3 font-medium text-red-800">0 - 1</td>
+                                    <td class="px-4 py-3 text-red-700">Muy Alto</td>
+                                    <td class="px-4 py-3 text-gray-700">Crisis grave, indicios de insolvencia.</td>
+                                </tr>
+                                <tr class="bg-orange-50">
+                                    <td class="px-4 py-3 font-medium text-orange-800">2 - 3</td>
+                                    <td class="px-4 py-3 text-orange-700">Alto</td>
+                                    <td class="px-4 py-3 text-gray-700">Dificultades serias, vulnerable.</td>
+                                </tr>
+                                <tr class="bg-yellow-50">
+                                    <td class="px-4 py-3 font-medium text-yellow-800">4 - 5</td>
+                                    <td class="px-4 py-3 text-yellow-700">Medio</td>
+                                    <td class="px-4 py-3 text-gray-700">Signos de debilidad (baja liquidez).</td>
+                                </tr>
+                                <tr class="bg-green-50">
+                                    <td class="px-4 py-3 font-medium text-green-800">6 - 8</td>
+                                    <td class="px-4 py-3 text-green-700">Bajo</td>
+                                    <td class="px-4 py-3 text-gray-700">Posición estable, liquidez ajustada.</td>
+                                </tr>
+                                <tr class="bg-teal-50">
+                                    <td class="px-4 py-3 font-medium text-teal-800">9 - 10</td>
+                                    <td class="px-4 py-3 text-teal-700">Muy Bajo</td>
+                                    <td class="px-4 py-3 text-gray-700">Posición muy sólida, alta rentabilidad.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Columna 2: Frecuencia y Fuentes -->
+                <!-- Se reutiliza el layout de tarjetas, adaptado a Frecuencia y Fuente -->
+                <div class="space-y-6">
+                    <div class="bg-white p-6 rounded-xl shadow-lg">
+                        <h3 class="text-2xl font-bold text-gray-800 mb-6 text-center">🔄 Frecuencia y Fuentes</h3>
+                        <p class="text-gray-600 mb-8 text-center">
+                            El análisis es preventivo y se basa en datos objetivos, auditados y de alta fiabilidad para permitir un monitoreo constante.
+                        </p>
+                        <div class="space-y-6">
+                            <div class="flex items-center bg-blue-50 p-6 rounded-lg border border-blue-200">
+                                <div class="text-4xl mr-5">🔄</div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-blue-800">Monitoreo Continuo</h4>
+                                    <p class="text-lg font-bold text-blue-700">Todos los Proveedores</p>
+                                    <p class="text-gray-600 mt-1">Análisis preventivo constante. Los informes financieros son anuales, pero las alertas son en tiempo real.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center bg-gray-50 p-6 rounded-lg border border-gray-200">
+                                <div class="text-4xl mr-5">📊</div>
+                                <div>
+                                    <h4 class="text-xl font-semibold text-gray-700">Fuentes de Datos Clave</h4>
+                                    <p class="text-lg font-bold text-gray-600">COFACE (Externa) + ERP (Interna)</p>
+                                    <p class="text-gray-600 mt-1">Rating financiero, alertas, comportamiento de pagos. Se complementa con historial interno.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section 4: Implementación y Responsables -->
+        <!-- Se reutiliza el grid de 2 columnas para Responsables y Observaciones Técnicas -->
+        <section id="implementacion" class="py-16 scroll-mt-16">
+            <h2 class="text-3xl font-bold text-center text-gray-900 mb-4">Implementación y Gobernanza</h2>
+            <p class="text-lg text-gray-600 text-center max-w-2xl mx-auto mb-12">
+                La gestión del riesgo financiero es una tarea transversal que se integra en los sistemas de compra y requiere alertas técnicas para la detección temprana.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">👥 Posibles Responsables Internos</h3>
+                    <p class="text-gray-600 mb-6">La evaluación y toma de decisiones involucra a múltiples áreas:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li>
+                            <strong>Gestor de Categoría:</strong> Revisión de datos y análisis contextual del proveedor.
+                        </li>
+                        <li>
+                            <strong>Área de Compliance / Riesgos:</strong> Validación técnica del scoring y gestión de alertas.
+                        </li>
+                        <li>
+                            <strong>Departamento Financiero:</strong> Apoyo en la interpretación de ratios contables.
+                        </li>
+                        <li>
+                            <strong>Compras:</strong> Toma de decisiones sobre la continuidad de contratos y planes de contingencia.
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-white p-8 rounded-xl shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-4">⚙️ Observaciones Técnicas Clave</h3>
+                    <p class="text-gray-600 mb-6">El sistema debe incluir una función de "Early Warning" con alertas automatizadas:</p>
+                    <ul class="list-disc list-inside space-y-3 text-gray-700">
+                        <li>
+                            <strong>Consolidación:</strong> Clave si el proveedor pertenece a un grupo empresarial.
+                        </li>
+                        <li>
+                            <strong>Indicadores Dinámicos:</strong> Usar Cash-Flow y EBITDA, más útiles que datos estáticos.
+                        </li>
+                        <li>
+                            <strong>Alertas (Early Warning):</strong> Deterioro de solvencia, baja de rating, variación negativa de ingresos > 10%, etc.
+                        </li>
+                        <li>
+                            <strong>Sensores de Mercado (Coface):</strong> Permiten anticipar disrupciones invisibles en las finanzas.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-800 text-gray-300 mt-16">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 text-center">
+            <p>&copy; 2025 Compañía. Todos los derechos reservados.</p>
+            <p class="text-sm text-gray-400 mt-1">Dashboard Interactivo de Gestión de Riesgo Financiero.</p>
+        </div>
+    </footer>
+
+    <!-- MISMA LÓGICA JS: Adaptada para los nuevos IDs y el nuevo Chart.js -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- Lógica de Navegación (Scroll y Activo) ---
+            const navLinks = document.querySelectorAll('.nav-link');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const sections = document.querySelectorAll('section[id]');
+
+            // Toggle menú móvil
+            mobileMenuButton.addEventListener('click', () => {
+                const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+                mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+                mobileMenu.classList.toggle('hidden');
+                mobileMenuButton.querySelectorAll('svg').forEach(svg => svg.classList.toggle('hidden'));
+            });
+
+            // Clic en enlaces de navegación
+            navLinks.forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const targetId = link.getAttribute('href');
+                    const targetElement = document.querySelector(targetId);
+                    if (targetElement) {
+                        targetElement.scrollIntoView({ behavior: 'smooth' });
+                    }
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        mobileMenuButton.querySelectorAll('svg').forEach(svg => svg.classList.toggle('hidden'));
+                    }
+                });
+            });
+
+            // Resaltar enlace activo al hacer scroll (IntersectionObserver)
+            const observerOptions = { root: null, rootMargin: '0px', threshold: 0.4 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const id = entry.target.getAttribute('id');
+                        navLinks.forEach(link => {
+                            link.classList.remove('nav-link-active');
+                            if (link.getAttribute('href') === `#${id}`) {
+                                link.classList.add('nav-link-active');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+            sections.forEach(section => { observer.observe(section); });
+
+            // --- Lógica de Pestañas de Subdimensiones ---
+            // Se actualizan los IDs para las nuevas pestañas
+            const pillarButtons = {
+                rentabilidad: document.getElementById('btn-rentabilidad'),
+                estructura: document.getElementById('btn-estructura'),
+                solvencia: document.getElementById('btn-solvencia')
+            };
+            const pillarContents = {
+                rentabilidad: document.getElementById('content-rentabilidad'),
+                estructura: document.getElementById('content-estructura'),
+                solvencia: document.getElementById('content-solvencia')
+            };
+
+            function showPillar(pillarKey) {
+                Object.values(pillarContents).forEach(content => content.classList.add('hidden'));
+                Object.values(pillarButtons).forEach(button => {
+                    button.classList.remove('pillar-button-active');
+                    button.classList.add('pillar-button-inactive');
+                });
+                pillarContents[pillarKey].classList.remove('hidden');
+                pillarButtons[pillarKey].classList.add('pillar-button-active');
+                pillarButtons[pillarKey].classList.remove('pillar-button-inactive');
+            }
+
+            // Se asignan los nuevos listeners
+            pillarButtons.rentabilidad.addEventListener('click', () => showPillar('rentabilidad'));
+            pillarButtons.estructura.addEventListener('click', () => showPillar('estructura'));
+            pillarButtons.solvencia.addEventListener('click', () => showPillar('solvencia'));
+
+            // Mostrar 'rentabilidad' por defecto
+            showPillar('rentabilidad');
+
+            // --- Lógica del Gráfico (Chart.js) ---
+            // Actualizado con los 5 niveles de riesgo financiero
+            const ctx = document.getElementById('scoringChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: [
+                        'Muy Alto (0-1)', 
+                        'Alto (2-3)', 
+                        'Medio (4-5)', 
+                        'Bajo (6-8)', 
+                        'Muy Bajo (9-10)'
+                    ],
+                    datasets: [{
+                        label: 'Zonas de Riesgo',
+                        // Datos representan el "ancho" de cada rango:
+                        // 0-1 (2 pts), 2-3 (2 pts), 4-5 (2 pts), 6-8 (3 pts), 9-10 (2 pts)
+                        data: [2, 2, 2, 3, 2],
+                        backgroundColor: [
+                            'rgb(211, 47, 47)',   // Rojo Oscuro (Muy Alto)
+                            'rgb(239, 68, 68)',   // Rojo (Alto)
+                            'rgb(245, 158, 11)',  // Ámbar (Medio)
+                            'rgb(102, 187, 106)', // Verde (Bajo)
+                            'rgb(27, 94, 32)'     // Verde Oscuro (Muy Bajo)
+                        ],
+                        borderColor: '#ffffff',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    let total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    let value = context.parsed;
+                                    // Se muestra el "ancho" del rango
+                                    label += `${value} puntos en la escala`;
+                                    return label;
+                                }
+                            }
+                        }
+                    },
+                    cutout: '60%'
+                }
+            });
+        });
+    </script>
+</body>
+</html>
